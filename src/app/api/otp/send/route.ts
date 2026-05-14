@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     await EmailOtp.findOneAndUpdate(
       { email },
       { email, otpHash: hashOtp(otp), expiresAt, verifiedAt: null },
-      { upsert: true, new: true }
+      { upsert: true, returnDocument: "after" }
     );
 
     await sendOtpEmail(email, otp);
