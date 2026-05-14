@@ -1,6 +1,3 @@
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
-import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { Athlete } from "@/models/Athlete";
@@ -24,20 +21,13 @@ function getAgeGroup(age: number) {
   return "Senior";
 }
 
-async function storeFile(file: File, folder: string) {
+async function storeFile(file: File) {
   const bytes = Buffer.from(await file.arrayBuffer());
-  const ext = path.extname(file.name) || (file.type.includes("pdf") ? ".pdf" : ".jpg");
-  const safeName = `${randomUUID()}${ext}`;
-  const relativeDir = path.join("uploads", folder);
-  const absoluteDir = path.join(process.cwd(), relativeDir);
-  await mkdir(absoluteDir, { recursive: true });
-  const absolutePath = path.join(absoluteDir, safeName);
-  await writeFile(absolutePath, bytes);
   return {
     fileName: file.name,
     mimeType: file.type,
     size: file.size,
-    path: path.join(relativeDir, safeName),
+    data: bytes,
   };
 }
 
@@ -78,9 +68,9 @@ export async function POST(req: Request) {
         ageGroup: getAgeGroup(age),
       },
       documents: {
-        photoId: await storeFile(photoId, "photoId"),
-        dobProof: await storeFile(dobProof, "dobProof"),
-        medicalCertificate: await storeFile(medicalCertificate, "medicalCertificate"),
+        photoId: await storeFile(photoId),
+        dobProof: await storeFile(dobProof),
+        medicalCertificate: await storeFile(medicalCertificate),
       },
       status: "Submitted",
     });

@@ -21,14 +21,27 @@ export async function GET(_: Request, { params }: { params: Promise<{ athleteId:
   }
 
   await connectDB();
-  const athlete = await Athlete.findById(athleteId).lean();
+  const athlete = await Athlete.findById(athleteId);
   if (!athlete) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const document = athlete.documents[docKey as AllowedKey];
-  const absolutePath = path.join(/* turbopackIgnore: true */ process.cwd(), document.path);
-  const fileBuffer = await readFile(absolutePath);
+  const document = athlete.documents[docKey as AllowedKey] as {
+    fileName: string;
+    mimeType: string;
+    data?: Buffer;
+    path?: string;
+  };
 
-  return new NextResponse(fileBuffer, {
+  let fileBuffer: Buffer;
+  if (document.data) {
+    fileBuffer = Buffer.from(document.data);
+  } else if (document.path) {
+    const fsPath = path.join(/* turbopackIgnore: true */ process.cwd(), document.path);
+    fileBuffer = await readFile(fsPath);
+  } else {
+    return NextResponse.json({ error: "Document data missing" }, { status: 404 });
+  }
+
+  return new NextResponse(new Uint8Array(fileBuffer), {
     headers: {
       "Content-Type": document.mimeType,
       "Content-Disposition": `attachment; filename="${document.fileName}"`,

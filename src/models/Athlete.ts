@@ -5,7 +5,8 @@ const documentSchema = new Schema(
     fileName: { type: String, required: true },
     mimeType: { type: String, required: true },
     size: { type: Number, required: true },
-    path: { type: String, required: true },
+    data: { type: Buffer },
+    path: { type: String },
   },
   { _id: false }
 );
