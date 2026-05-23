@@ -28,13 +28,23 @@ export async function POST(req: Request) {
     await EmailOtp.findOneAndUpdate(
       { email },
       { email, otpHash: hashOtp(otp), expiresAt, verifiedAt: null },
-      { upsert: true, returnDocument: "after" }
+      { upsert: true, new: true }
     );
 
     await sendOtpEmail(email, otp);
 
     return NextResponse.json({ message: "OTP sent" });
-  } catch {
+  } catch (error) {
+    console.error("POST /api/otp/send failed:", error);
+
+    const message = error instanceof Error ? error.message : "Unknown error";
+    if (message.includes("querySrv") || message.includes("MONGODB_URI")) {
+      return NextResponse.json(
+        { error: "Database is unavailable. Please try again shortly." },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json({ error: "Failed to send OTP" }, { status: 500 });
   }
 }

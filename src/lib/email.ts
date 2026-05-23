@@ -12,7 +12,11 @@ function getEmailConfig() {
     throw new Error("Missing email SMTP configuration in environment");
   }
 
-  return { host, port, secure, user, pass, from };
+  // Gmail commonly rejects custom `from` addresses unless configured as aliases.
+  const normalizedHost = host.toLowerCase();
+  const effectiveFrom = normalizedHost.includes("gmail.com") ? user : from;
+
+  return { host, port, secure, user, pass, from: effectiveFrom };
 }
 
 export async function sendOtpEmail(to: string, otp: string) {
