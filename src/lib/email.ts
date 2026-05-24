@@ -39,3 +39,40 @@ export async function sendOtpEmail(to: string, otp: string) {
     html: `<p>Your OTP is <b>${otp}</b>.</p><p>It expires in 10 minutes.</p>`,
   });
 }
+
+export async function sendRegistrationDecisionEmail({
+  to,
+  firstName,
+  role,
+  status,
+}: {
+  to: string;
+  firstName: string;
+  role: "Athlete" | "Coach";
+  status: "Approved" | "Rejected";
+}) {
+  const cfg = getEmailConfig();
+  const transporter = nodemailer.createTransport({
+    host: cfg.host,
+    port: cfg.port,
+    secure: cfg.secure,
+    auth: {
+      user: cfg.user,
+      pass: cfg.pass,
+    },
+  });
+
+  const subject = `${role} Registration ${status}`;
+  const message =
+    status === "Approved"
+      ? `Dear ${firstName}, your ${role.toLowerCase()} registration has been approved by the admin.`
+      : `Dear ${firstName}, your ${role.toLowerCase()} registration has been rejected by the admin.`;
+
+  await transporter.sendMail({
+    from: cfg.from,
+    to,
+    subject,
+    text: message,
+    html: `<p>${message}</p>`,
+  });
+}

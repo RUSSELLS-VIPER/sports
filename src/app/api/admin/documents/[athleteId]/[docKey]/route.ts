@@ -3,6 +3,7 @@ import path from "path";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { Athlete } from "@/models/Athlete";
+import { Coach } from "@/models/Coach";
 import { isAdminAuthenticated } from "@/lib/auth";
 
 const allowedKeys = ["photoId", "dobProof", "medicalCertificate"] as const;
@@ -16,15 +17,17 @@ export async function GET(_: Request, { params }: { params: Promise<{ athleteId:
   }
 
   const { athleteId, docKey } = await params;
+  const url = new URL(_.url);
+  const type = url.searchParams.get("type") === "coach" ? "coach" : "athlete";
   if (!allowedKeys.includes(docKey as AllowedKey)) {
     return NextResponse.json({ error: "Invalid document key" }, { status: 400 });
   }
 
   await connectDB();
-  const athlete = await Athlete.findById(athleteId);
-  if (!athlete) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  const record = type === "coach" ? await Coach.findById(athleteId) : await Athlete.findById(athleteId);
+  if (!record) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const document = athlete.documents[docKey as AllowedKey] as {
+  const document = record.documents[docKey as AllowedKey] as {
     fileName: string;
     mimeType: string;
     data?: Buffer;

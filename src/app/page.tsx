@@ -1,10 +1,10 @@
 import Link from "next/link";
 
 const highlights = [
-  "6-step guided athlete registration",
+  "6-step guided athlete and coach registration",
   "OTP email verification before submission",
   "Smart document checks with image compression",
-  "Admin dashboard with CSV export and secure access",
+  "Admin dashboard with approve/reject actions and secure access",
 ];
 
 export default function HomePage() {
@@ -15,15 +15,16 @@ export default function HomePage() {
           <p className="font-semibold tracking-wide">Sports Portal</p>
           <div className="flex gap-3 text-sm">
             <Link className="rounded-full bg-emerald-700 px-4 py-2 text-white" href="/register">Register Athlete</Link>
+            <Link className="rounded-full border border-slate-300 px-4 py-2 text-slate-800" href="/register/coach">Register Coach</Link>
             <Link className="rounded-full border border-slate-300 px-4 py-2 text-slate-800" href="/admin/login">Admin Login</Link>
           </div>
         </nav>
 
         <div className="grid gap-8 md:grid-cols-[1.2fr_1fr] md:items-center">
           <div>
-            <h1 className="text-4xl font-black leading-tight md:text-6xl">Athlete Registration and Admin Operations</h1>
+            <h1 className="text-4xl font-black leading-tight md:text-6xl">Sports Registration and Admin Operations</h1>
             <p className="mt-5 max-w-xl text-slate-600">
-              Unified intake for athlete applications with strict validation, secure document storage, and a lightweight admin panel for review and export.
+              Unified intake for athlete and coach applications with strict validation, secure document storage, and a lightweight admin panel for review.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold !text-white" href="/register">Start Registration</Link>

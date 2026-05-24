@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed:dummy": "node --env-file=.env scripts/seed-dummy-data.mjs"
   },
   "dependencies": {
     "jose": "^6.2.3",
@@ -30,3 +31,4 @@
     "typescript": "^5"
   }
 }
+
